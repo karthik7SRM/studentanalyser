@@ -1,0 +1,89 @@
+from tkinter import *
+from tkinter.ttk import *
+from tkinter import messagebox
+import mysql.connector as m
+import csv
+record = []
+def submit():
+    if len(name.get()) > 0:
+        if marks.get().isdigit():
+            ma = int(marks.get())
+            if attendance.get().isdigit():
+                at = int(attendance.get())
+                if len(area.get()) > 0:
+                    if len(income.get()) > 0:
+                        if len(parent.get()) > 0:
+                            messagebox.showinfo(title="Success", message="Correct Information!")
+                            n = name.get()
+                            ar = area.get()
+                            inc = income.get()
+                            p = parent.get()
+                            cur.execute("insert into YOURTABLE values('{}',{},{},'{}','{}','{}')".format(n, ma, at, ar, inc, p))
+                            con.commit()
+                            cur.close()
+                            data = [n,ma,at,ar,inc,p]
+                            record.append(data)
+                            f = open("YOURTABLE.csv","a",newline="")
+                            wri = csv.writer(f)
+                            wri.writerows(record)
+                            f.close()
+                            messagebox.showinfo(title="Completed",message="Data added to database!")
+                        else:
+                            messagebox.showerror("Input Error", "Please enter the Parent Education Level.")
+                    else:
+                        messagebox.showerror("Input Error", "Income should be a valid number.")
+                else:
+                    messagebox.showerror("Input Error", "Please enter the Area.")
+            else:
+                messagebox.showerror("Input Error", "Attendance should be a valid number.")
+        else:
+            messagebox.showerror("Input Error", "Marks should be a valid number.")
+    else:
+        messagebox.showerror("Input Error", "Please enter your Name.")
+
+
+w = Tk()
+w.configure(background="cyan")
+
+
+Label(w, text="STUDENT MARKS DASHBOARD", font=("Arial", 45, "bold"), background="cyan").grid(row=0, column=0, columnspan=2, pady=20)
+
+
+Label(w, text="Student Name", font=("Arial", 20, "bold"), background="cyan").grid(row=1, column=0, sticky="w", padx=20, pady=10)
+name = Entry(w, font=("Arial", 20, "bold"), width=30)
+name.grid(row=1, column=1, padx=20, pady=10)
+
+Label(w, text="Overall Marks", font=("Arial", 20, "bold"), background="cyan").grid(row=2, column=0, sticky="w", padx=20, pady=10)
+marks = Entry(w, font=("Arial", 20, "bold"), width=30)
+marks.grid(row=2, column=1, padx=20, pady=10)
+
+Label(w, text="Overall Attendance", font=("Arial", 20, "bold"), background="cyan").grid(row=3, column=0, sticky="w", padx=20, pady=10)
+attendance = Entry(w, font=("Arial", 20, "bold"), width=30)
+attendance.grid(row=3, column=1, padx=20, pady=10)
+
+Label(w, text="Area", font=("Arial", 20, "bold"), background="cyan").grid(row=4, column=0, sticky="w", padx=20, pady=10)
+area = Combobox(w, values=["Rural", "Urban", "Suburban"], font=("Arial", 20, "bold"), width=30)
+area.grid(row=4, column=1, padx=20, pady=10)
+
+Label(w, text="Household Income", font=("Arial", 20, "bold"), background="cyan").grid(row=5, column=0, sticky="w", padx=20, pady=10)
+income = Combobox(w, values=["Low", "Medium", "High"], font=("Arial", 20, "bold"), width=30)
+income.grid(row=5, column=1, padx=20, pady=10)
+
+Label(w, text="Parent Education", font=("Arial", 20, "bold"), background="cyan").grid(row=6, column=0, sticky="w", padx=20, pady=10)
+parent = Combobox(w, values=["Primary", "Secondary", "Higher"], font=("Arial", 20, "bold"), width=30)
+parent.grid(row=6, column=1, padx=20, pady=10)
+
+con = m.connect(host="HOST",username="YOURUSERNAME",password="YOURPASSWORD",database="YOURDATABASE")
+cur = con.cursor()
+
+Button(w, text="SUBMIT", command=submit, width=20).grid(row=7, column=0, columnspan=2, pady=20)
+
+
+w.grid_columnconfigure(0, weight=1, minsize=200)
+w.grid_columnconfigure(1, weight=3, minsize=400)
+
+for i in w.winfo_children():
+    i.grid_configure(pady=10, padx=20)
+
+
+mainloop()
